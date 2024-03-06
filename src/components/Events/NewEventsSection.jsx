@@ -9,7 +9,7 @@ export default function NewEventsSection() {
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['events'],
     queryFn: getEvents,
-    staleTime: 5000, //время через сколько отправится запрос
+    //staleTime: 5000, //время через сколько отправится запрос
     //gcTime: 30000 //время через сколько сбросится кэш
   });
 

@@ -5,8 +5,13 @@ const EventForm = ({ inputData, onSubmit, children }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const formData = new FormData(event.target);
-    onSubmit(Object.fromEntries(formData));
+    let formData = new FormData(event.target);
+    const data = Object.fromEntries(formData)
+    if(data.file.name === '') {
+      delete data.file;
+      data.image = inputData?.image
+    }
+    onSubmit(data);
   }
 
   const handleFileChange = (event) => {
@@ -43,7 +48,7 @@ const EventForm = ({ inputData, onSubmit, children }) => {
           name="file"
           onChange={handleFileChange}
         />
-        <img width={100} src={imageUrl} alt={imageUrl} />
+        <img width={100} src={imageUrl || inputData?.image} alt={imageUrl} />
       </p>
       </div>
 

@@ -7,7 +7,8 @@ import {
   addDoc,
   doc,
   getDoc,
-  deleteDoc
+  deleteDoc,
+  updateDoc
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../firebase';
@@ -45,7 +46,7 @@ export const createNewEvent = async ({ file, ...anotherEventData }) => {
   }
 }
 
-export async function getEvent({ id }) {
+export const getEvent = async ({ id }) => {
   try {
     const docRef = doc(db, 'events', id)
     const response = await getDoc(docRef);
@@ -63,12 +64,30 @@ export async function getEvent({ id }) {
   }
 }
 
-
-export async function deleteEvent({ id }) {
+export const deleteEvent = async ({ id }) => {
   try {
     const docRef = doc(db, 'events', id);
     await deleteDoc(docRef);
   } catch (err) {
     throw JSON.parse(JSON.stringify(err));
+  }
+}
+
+export const updateEvent = async ({ id, event }) => {
+  const { file, ...anotherEventData } = event;
+  try {
+    let image;
+    const docRef = doc(db, 'events', id);
+    if (file) {
+      const fileRef = ref(storage, `events/${file.name}`);
+      const uploadFile = await uploadBytes(fileRef, file);
+      image = uploadFile.metadata.fullPath;
+    } else {
+      image = anotherEventData.image
+    }
+    const newData = {...anotherEventData, image};
+    await updateDoc(docRef, newData);
+  } catch (err) {
+    throw JSON.parse(JSON.stringify(err))
   }
 }
