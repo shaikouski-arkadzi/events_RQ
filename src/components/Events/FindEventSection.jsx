@@ -11,8 +11,8 @@ const FindEventSection = () => {
   const [searchTerm, setSearchTerm] = useState();
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ['events', { search: searchTerm }],
-    queryFn: () => getEvents(searchTerm),
+    queryKey: ['events', { searchTerm: searchTerm }],
+    queryFn: ({ queryKey }) => getEvents({ ...queryKey[1] }),
     enabled: searchTerm !== undefined
   })
 
