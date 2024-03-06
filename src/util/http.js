@@ -1,5 +1,14 @@
 import { QueryClient } from '@tanstack/react-query';
-import { getDocs, collection, query, where, addDoc } from 'firebase/firestore';
+import { 
+  getDocs,
+  collection,
+  query,
+  where,
+  addDoc,
+  doc,
+  getDoc,
+  deleteDoc
+} from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../firebase';
 
@@ -34,6 +43,32 @@ export const createNewEvent = async ({ file, ...anotherEventData }) => {
   } catch (err) {
     throw JSON.parse(JSON.stringify(err))
   }
+}
 
-  return event;
+export async function getEvent({ id }) {
+  try {
+    const docRef = doc(db, 'events', id)
+    const response = await getDoc(docRef);
+    const data = response.data();
+    const imageRef = ref(storage, data.image);
+    const image = await getDownloadURL(imageRef);
+    
+    return { 
+      ...response.data(),
+      id: response.id, 
+      image
+    }
+  } catch (err) {
+    throw JSON.parse(JSON.stringify(err));
+  }
+}
+
+
+export async function deleteEvent({ id }) {
+  try {
+    const docRef = doc(db, 'events', id);
+    await deleteDoc(docRef);
+  } catch (err) {
+    throw JSON.parse(JSON.stringify(err));
+  }
 }
