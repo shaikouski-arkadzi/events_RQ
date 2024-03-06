@@ -1,22 +1,26 @@
 import { useState } from 'react';
 
-import ImagePicker from '../ImagePicker.jsx';
+const EventForm = ({ inputData, onSubmit, children }) => {
+  const [imageUrl, setImageUrl] = useState('');
 
-export default function EventForm({ inputData, onSubmit, children }) {
-  const [selectedImage, setSelectedImage] = useState(inputData?.image);
-
-  function handleSelectImage(image) {
-    setSelectedImage(image);
-  }
-
-  function handleSubmit(event) {
+  const handleSubmit = (event) => {
     event.preventDefault();
-
     const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData);
-
-    onSubmit({ ...data, image: selectedImage });
+    onSubmit(Object.fromEntries(formData));
   }
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setImageUrl(reader.result);
+    };
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <form id="event-form" onSubmit={handleSubmit}>
@@ -31,11 +35,16 @@ export default function EventForm({ inputData, onSubmit, children }) {
       </p>
 
       <div className="control">
-        <ImagePicker
-          images={[]}
-          onSelect={handleSelectImage}
-          selectedImage={selectedImage}
+      <p>
+        <label htmlFor="image">Image</label>
+        <input
+          type="file"
+          id="file"
+          name="file"
+          onChange={handleFileChange}
         />
+        <img width={100} src={imageUrl} alt={imageUrl} />
+      </p>
       </div>
 
       <p className="control">
@@ -63,3 +72,5 @@ export default function EventForm({ inputData, onSubmit, children }) {
     </form>
   );
 }
+
+export default EventForm;

@@ -1,6 +1,9 @@
+import { QueryClient } from '@tanstack/react-query';
 import { getDocs, collection, query, where, addDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../firebase';
+
+export const queryClient = new QueryClient();
 
 export const getEvents = async (searchTitle = '') => {
   try {
@@ -21,15 +24,12 @@ export const getEvents = async (searchTitle = '') => {
   }
 }
 
-export const createNewEvent = async (eventData) => {
-  console.log(eventData);
+export const createNewEvent = async ({ file, ...anotherEventData }) => {
   try {
-    const fileRef = ref(storage, `events/${eventData.image?.name}`);
-    console.log(fileRef);
-    const uploadFile = await uploadBytes(fileRef, eventData.image);
-    console.log(uploadFile);
+    const fileRef = ref(storage, `events/${file?.name}`);
+    const uploadFile = await uploadBytes(fileRef, file);
     const collectionRef = collection(db, 'events');
-    const newData = {...eventData, image: uploadFile.metadata.fullPath};
+    const newData = {...anotherEventData, image: uploadFile.metadata.fullPath};
     await addDoc(collectionRef, newData);
   } catch (err) {
     throw JSON.parse(JSON.stringify(err))
