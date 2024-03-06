@@ -20,9 +20,7 @@ export default function NewEventsSection() {
   }
 
   if (isError) {
-    content = (
-      <ErrorBlock title="An error occurred" message={error} />
-    );
+    content = <ErrorBlock error={error} />;
   }
 
   if (data) {

@@ -1,5 +1,5 @@
-import { getDocs, collection, query, where } from 'firebase/firestore';
-import { getDownloadURL, ref } from 'firebase/storage';
+import { getDocs, collection, query, where, addDoc } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../firebase';
 
 export const getEvents = async (searchTitle = '') => {
@@ -19,4 +19,21 @@ export const getEvents = async (searchTitle = '') => {
   } catch (err) {
     throw JSON.parse(JSON.stringify(err));
   }
+}
+
+export const createNewEvent = async (eventData) => {
+  console.log(eventData);
+  try {
+    const fileRef = ref(storage, `events/${eventData.image?.name}`);
+    console.log(fileRef);
+    const uploadFile = await uploadBytes(fileRef, eventData.image);
+    console.log(uploadFile);
+    const collectionRef = collection(db, 'events');
+    const newData = {...eventData, image: uploadFile.metadata.fullPath};
+    await addDoc(collectionRef, newData);
+  } catch (err) {
+    throw JSON.parse(JSON.stringify(err))
+  }
+
+  return event;
 }

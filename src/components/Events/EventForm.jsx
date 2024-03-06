@@ -57,27 +57,7 @@ export default function EventForm({ inputData, onSubmit, children }) {
             defaultValue={inputData?.date ?? ''}
           />
         </p>
-
-        <p className="control">
-          <label htmlFor="time">Time</label>
-          <input
-            type="time"
-            id="time"
-            name="time"
-            defaultValue={inputData?.time ?? ''}
-          />
-        </p>
       </div>
-
-      <p className="control">
-        <label htmlFor="location">Location</label>
-        <input
-          type="text"
-          id="location"
-          name="location"
-          defaultValue={inputData?.location ?? ''}
-        />
-      </p>
 
       <p className="form-actions">{children}</p>
     </form>

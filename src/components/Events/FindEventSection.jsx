@@ -12,7 +12,8 @@ const FindEventSection = () => {
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['events', { search: searchTerm }],
-    queryFn: () => getEvents(searchTerm)
+    queryFn: () => getEvents(searchTerm),
+    enabled: searchTerm !== undefined
   })
 
   function handleSubmit(event) {
@@ -27,12 +28,7 @@ const FindEventSection = () => {
   }
 
   if (isError) {
-    content = (
-      <ErrorBlock
-        title="An error occurred"
-        message={error}
-      />
-    );
+    content = <ErrorBlock error={error}/>;
   }
 
   if (data) {
