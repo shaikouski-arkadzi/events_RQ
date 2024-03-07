@@ -4,6 +4,7 @@ import LoadingIndicator from '../UI/LoadingIndicator.jsx';
 import ErrorBlock from '../UI/ErrorBlock.jsx';
 import EventItem from './EventItem.jsx';
 import { getEvents } from '../../util/http.js';
+import { useState } from 'react';
 
 export default function NewEventsSection() {
   const { data, isPending, isError, error } = useQuery({
@@ -12,6 +13,18 @@ export default function NewEventsSection() {
     //staleTime: 5000, //время через сколько отправится запрос
     //gcTime: 30000 //время через сколько сбросится кэш
   });
+
+  const [expanded, setExpanded] = useState(null);
+
+  const handleViewDetails = (id) => {
+    setExpanded((prevId) => {
+      if (prevId === id) {
+        return null;
+      }
+
+      return id;
+    });
+  }
 
   let content;
 
@@ -28,7 +41,11 @@ export default function NewEventsSection() {
       <ul className="events-list">
         {data.map((event) => (
           <li key={event.id}>
-            <EventItem event={event} />
+            <EventItem 
+              event={event}
+              onViewDetails={() => handleViewDetails(event.id)}
+              isExpanded={expanded === event.id}
+            />
           </li>
         ))}
       </ul>

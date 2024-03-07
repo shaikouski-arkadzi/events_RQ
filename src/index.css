@@ -454,3 +454,23 @@ ul {
     transform: translateY(0);
   }
 }
+
+.challenge-item-details button {
+  cursor: pointer;
+  font: inherit;
+  background: transparent;
+  border: none;
+  color: #7aaafc;
+  padding: 0;
+}
+
+.challenge-item-details-icon {
+  display: inline-block;
+  font-size: 0.85rem;
+  margin-left: 0.25rem;
+  transition: transform 0.3s ease-out;
+}
+
+.challenge-item-details.expanded .challenge-item-details-icon {
+  transform: rotate(180deg);
+}
