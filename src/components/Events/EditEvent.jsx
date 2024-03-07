@@ -1,47 +1,58 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { 
+  Link,
+  useNavigate,
+  useParams,
+  useSubmit,
+  useNavigation
+} from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 
 import Modal from '../UI/Modal.jsx';
 import EventForm from './EventForm.jsx';
-import { updateEvent, queryClient, getEvent } from '../../util/http.js';
-import LoadingIndicator from '../UI/LoadingIndicator.jsx';
+import { getEvent } from '../../util/http.js';
 import ErrorBlock from '../UI/ErrorBlock.jsx';
 
 const EditEvent = () => {
   const navigate = useNavigate();
   const params = useParams();
+  const submit = useSubmit();
+  const { state } = useNavigation()
 
-  const { data, isPending, isError, error } = useQuery({
+  //useQuery нужно оставить чтоб пользоваться закэшированными данными
+  //и отправлять запросы при переключении вкладок, например
+  const { data, isError, error } = useQuery({
     queryKey: ['events', params.id],
     queryFn: () => getEvent({ id: params.id }),
+    staleTime: 10000
   });
 
-  const { mutate } = useMutation({
-    mutationFn: updateEvent,
-    //выполняется после отправки запроса до получения данных от сервера
-    onMutate: async (data) => {
-      const newEvent = data.event;
-      //отменяем загрузку новых данных по запросу
-      await queryClient.cancelQueries({ queryKey: ['events', params.id] });
-      const previousEvent = queryClient.getQueryData(['events', params.id]);
+  // const { mutate } = useMutation({
+  //   mutationFn: updateEvent,
+  //   //выполняется после отправки запроса до получения данных от сервера
+  //   onMutate: async (data) => {
+  //     const newEvent = data.event;
+  //     //отменяем загрузку новых данных по запросу
+  //     await queryClient.cancelQueries({ queryKey: ['events', params.id] });
+  //     const previousEvent = queryClient.getQueryData(['events', params.id]);
 
-      //сетим в закэшированнные данные новые данные
-      queryClient.setQueryData(['events', params.id], newEvent);
-      //переносим в context
-      return { previousEvent };
-    },
-    onError: (error, data, context) => {
-      queryClient.setQueryData(['events', params.id], context.previousEvent);
-    },
-    //отрабатывает после любого исхода мутации
-    onSettled: () => {
-      queryClient.invalidateQueries(['events', params.id]);
-    }
-  });
+  //     //сетим в закэшированнные данные новые данные
+  //     queryClient.setQueryData(['events', params.id], newEvent);
+  //     //переносим в context
+  //     return { previousEvent };
+  //   },
+  //   onError: (error, data, context) => {
+  //     queryClient.setQueryData(['events', params.id], context.previousEvent);
+  //   },
+  //   //отрабатывает после любого исхода мутации
+  //   onSettled: () => {
+  //     queryClient.invalidateQueries(['events', params.id]);
+  //   }
+  // });
 
   const handleSubmit = (formData) => {
-    mutate({ id: params.id, event: formData });
-    navigate('../');
+    // mutate({ id: params.id, event: formData });
+    // navigate('../');
+    submit(formData, { method: 'PUT' });
   }
 
   const handleClose = () => {
@@ -49,14 +60,6 @@ const EditEvent = () => {
   }
 
   let content;
-
-  if (isPending) {
-    content = (
-      <div className="center">
-        <LoadingIndicator />
-      </div>
-    );
-  }
 
   if (isError) {
     content = (
@@ -74,12 +77,18 @@ const EditEvent = () => {
   if (data) {
     content = (
       <EventForm inputData={data} onSubmit={handleSubmit}>
-        <Link to="../" className="button-text">
-          Cancel
-        </Link>
-        <button type="submit" className="button">
-          Update
-        </button>
+        {state === 'submitting' ? (
+          <p>Sending data...</p>
+        ) : (
+          <>
+            <Link to="../" className="button-text">
+              Cancel
+            </Link>
+            <button type="submit" className="button">
+              Update
+            </button>
+          </>
+        )}
       </EventForm>
     );
   }
