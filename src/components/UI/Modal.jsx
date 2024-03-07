@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { motion } from 'framer-motion';
 
 export default function Modal({ children, onClose }) {
   const dialog = useRef();
@@ -16,9 +17,15 @@ export default function Modal({ children, onClose }) {
   }, []);
 
   return createPortal(
-    <dialog className="modal" ref={dialog} onClose={onClose}>
+    <motion.dialog 
+      className="modal"
+      ref={dialog}
+      onClose={onClose}
+      initial={{opacity: 0, y: 30}}
+      animate={{opacity: 1, y: 0}}
+    >
       {children}
-    </dialog>,
+    </motion.dialog>,
     document.getElementById('modal')
   );
 }
