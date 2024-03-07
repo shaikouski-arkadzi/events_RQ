@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query'
+import { motion } from 'framer-motion';
 
 import LoadingIndicator from '../UI/LoadingIndicator.jsx';
 import ErrorBlock from '../UI/ErrorBlock.jsx';
 import EventItem from './EventItem.jsx';
 import { getEvents } from '../../util/http.js';
-import { useState } from 'react';
 
 export default function NewEventsSection() {
   const { data, isPending, isError, error } = useQuery({
@@ -38,17 +39,35 @@ export default function NewEventsSection() {
 
   if (data) {
     content = (
-      <ul className="events-list">
+      <motion.ul
+        className="events-list"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: {
+            transition: {
+              staggerChildren: 0.05
+            }
+          }
+        }}
+      >
         {data.map((event) => (
-          <li key={event.id}>
+          <motion.li
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1 }
+            }}
+            key={event.id}
+          >
             <EventItem 
               event={event}
               onViewDetails={() => handleViewDetails(event.id)}
               isExpanded={expanded === event.id}
             />
-          </li>
+          </motion.li>
         ))}
-      </ul>
+      </motion.ul>
     );
   }
 
